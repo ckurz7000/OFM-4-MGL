@@ -26,6 +26,8 @@ Partial Class frmTile
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.pbxTile = New System.Windows.Forms.PictureBox()
         Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.Label11 = New System.Windows.Forms.Label()
+        Me.Label10 = New System.Windows.Forms.Label()
         Me.Label7 = New System.Windows.Forms.Label()
         Me.Label9 = New System.Windows.Forms.Label()
         Me.Label13 = New System.Windows.Forms.Label()
@@ -37,6 +39,11 @@ Partial Class frmTile
         Me.Label8 = New System.Windows.Forms.Label()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.Panel2 = New System.Windows.Forms.Panel()
+        Me.Label12 = New System.Windows.Forms.Label()
+        Me.btnApply = New System.Windows.Forms.Button()
+        Me.btnReset = New System.Windows.Forms.Button()
+        Me.tbrBrightness = New System.Windows.Forms.TrackBar()
+        Me.tbrSaturation = New System.Windows.Forms.TrackBar()
         Me.tbrContrast = New System.Windows.Forms.TrackBar()
         Me.lblSize = New System.Windows.Forms.Label()
         Me.lblDump = New System.Windows.Forms.Label()
@@ -52,6 +59,8 @@ Partial Class frmTile
         CType(Me.pbxTile, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
+        CType(Me.tbrBrightness, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.tbrSaturation, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.tbrContrast, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -88,6 +97,8 @@ Partial Class frmTile
         Me.Panel1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Panel1.Controls.Add(Me.Label11)
+        Me.Panel1.Controls.Add(Me.Label10)
         Me.Panel1.Controls.Add(Me.Label7)
         Me.Panel1.Controls.Add(Me.Label9)
         Me.Panel1.Controls.Add(Me.Label13)
@@ -103,12 +114,36 @@ Partial Class frmTile
         Me.Panel1.Size = New System.Drawing.Size(94, 602)
         Me.Panel1.TabIndex = 1
         '
+        'Label11
+        '
+        Me.Label11.Anchor = System.Windows.Forms.AnchorStyles.Right
+        Me.Label11.AutoSize = True
+        Me.Label11.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.Label11.Location = New System.Drawing.Point(30, 327)
+        Me.Label11.Name = "Label11"
+        Me.Label11.Size = New System.Drawing.Size(59, 13)
+        Me.Label11.TabIndex = 0
+        Me.Label11.Text = "Brightness:"
+        Me.Label11.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'Label10
+        '
+        Me.Label10.Anchor = System.Windows.Forms.AnchorStyles.Right
+        Me.Label10.AutoSize = True
+        Me.Label10.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.Label10.Location = New System.Drawing.Point(31, 426)
+        Me.Label10.Name = "Label10"
+        Me.Label10.Size = New System.Drawing.Size(58, 13)
+        Me.Label10.TabIndex = 0
+        Me.Label10.Text = "Saturation:"
+        Me.Label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
         'Label7
         '
         Me.Label7.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.Label7.AutoSize = True
         Me.Label7.FlatStyle = System.Windows.Forms.FlatStyle.System
-        Me.Label7.Location = New System.Drawing.Point(41, 326)
+        Me.Label7.Location = New System.Drawing.Point(41, 377)
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(49, 13)
         Me.Label7.TabIndex = 0
@@ -220,6 +255,11 @@ Partial Class frmTile
         Me.Panel2.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Panel2.Controls.Add(Me.Label12)
+        Me.Panel2.Controls.Add(Me.btnApply)
+        Me.Panel2.Controls.Add(Me.btnReset)
+        Me.Panel2.Controls.Add(Me.tbrBrightness)
+        Me.Panel2.Controls.Add(Me.tbrSaturation)
         Me.Panel2.Controls.Add(Me.tbrContrast)
         Me.Panel2.Controls.Add(Me.lblSize)
         Me.Panel2.Controls.Add(Me.lblDump)
@@ -236,10 +276,59 @@ Partial Class frmTile
         Me.Panel2.Size = New System.Drawing.Size(140, 602)
         Me.Panel2.TabIndex = 1
         '
+        'Label12
+        '
+        Me.Label12.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
+        Me.Label12.Location = New System.Drawing.Point(6, 307)
+        Me.Label12.Name = "Label12"
+        Me.Label12.Size = New System.Drawing.Size(128, 2)
+        Me.Label12.TabIndex = 3
+        Me.Label12.Text = "Label12"
+        '
+        'btnApply
+        '
+        Me.btnApply.Location = New System.Drawing.Point(85, 479)
+        Me.btnApply.Name = "btnApply"
+        Me.btnApply.Size = New System.Drawing.Size(49, 29)
+        Me.btnApply.TabIndex = 2
+        Me.btnApply.Text = "Apply"
+        Me.btnApply.UseVisualStyleBackColor = True
+        '
+        'btnReset
+        '
+        Me.btnReset.Location = New System.Drawing.Point(6, 479)
+        Me.btnReset.Name = "btnReset"
+        Me.btnReset.Size = New System.Drawing.Size(49, 29)
+        Me.btnReset.TabIndex = 2
+        Me.btnReset.Text = "Reset"
+        Me.btnReset.UseVisualStyleBackColor = True
+        '
+        'tbrBrightness
+        '
+        Me.tbrBrightness.LargeChange = 10
+        Me.tbrBrightness.Location = New System.Drawing.Point(0, 325)
+        Me.tbrBrightness.Maximum = 100
+        Me.tbrBrightness.Minimum = -100
+        Me.tbrBrightness.Name = "tbrBrightness"
+        Me.tbrBrightness.Size = New System.Drawing.Size(140, 45)
+        Me.tbrBrightness.TabIndex = 1
+        Me.tbrBrightness.TickFrequency = 20
+        '
+        'tbrSaturation
+        '
+        Me.tbrSaturation.LargeChange = 10
+        Me.tbrSaturation.Location = New System.Drawing.Point(0, 423)
+        Me.tbrSaturation.Maximum = 100
+        Me.tbrSaturation.Minimum = -100
+        Me.tbrSaturation.Name = "tbrSaturation"
+        Me.tbrSaturation.Size = New System.Drawing.Size(140, 45)
+        Me.tbrSaturation.TabIndex = 1
+        Me.tbrSaturation.TickFrequency = 20
+        '
         'tbrContrast
         '
         Me.tbrContrast.LargeChange = 10
-        Me.tbrContrast.Location = New System.Drawing.Point(0, 321)
+        Me.tbrContrast.Location = New System.Drawing.Point(0, 374)
         Me.tbrContrast.Maximum = 100
         Me.tbrContrast.Minimum = -100
         Me.tbrContrast.Name = "tbrContrast"
@@ -375,6 +464,8 @@ Partial Class frmTile
         Me.Panel1.PerformLayout()
         Me.Panel2.ResumeLayout(False)
         Me.Panel2.PerformLayout()
+        CType(Me.tbrBrightness, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.tbrSaturation, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.tbrContrast, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
@@ -405,4 +496,11 @@ Partial Class frmTile
     Friend WithEvents lblSize As Label
     Friend WithEvents Label7 As Label
     Friend WithEvents tbrContrast As TrackBar
+    Friend WithEvents Label10 As Label
+    Friend WithEvents tbrSaturation As TrackBar
+    Friend WithEvents Label11 As Label
+    Friend WithEvents tbrBrightness As TrackBar
+    Friend WithEvents Label12 As Label
+    Friend WithEvents btnApply As Button
+    Friend WithEvents btnReset As Button
 End Class

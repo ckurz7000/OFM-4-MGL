@@ -5,17 +5,18 @@ Public Class frmTile
     Public strMapFilename As String
     Public zoom As Integer
     Public ptCell As Point
+    Private curTile As Image
 
     Public Sub ShowTile() Handles Me.Invalidated
         'Displays info about a tile, indexed by idxTile, within a MAP file.
 
         Dim strMap = IO.Path.GetFileName(strMapFilename)
-        Dim TLLat As Integer = Mid(strMap, 6, 2) : If Mid(strMap, 5, 1) = "S" Then TLLat = -TLLat
-        Dim TLLon As Integer = Mid(strMap, 2, 3) : If Mid(strMap, 1, 1) = "W" Then TLLon = -TLLon
+        Dim TLLat As Integer = Mid(strMap, 6, 2) : If Mid(strMap, 5, 1) = "S" Then TLLat = -TLLat 'TL-latitude of map file.
+        Dim TLLon As Integer = Mid(strMap, 2, 3) : If Mid(strMap, 1, 1) = "W" Then TLLon = -TLLon 'TL-longitude of map file.
         Dim extent As Single = MGLMap.MGLExtent(zoom)
         Dim idxPtr As Integer
-        Dim Lat As Single = TLLat - ptCell.Y * extent
-        Dim Lon As Single = TLLon + ptCell.X * extent
+        Dim Lat As Single = TLLat - ptCell.Y * extent 'TL-latidtude of tile.
+        Dim Lon As Single = TLLon + ptCell.X * extent 'TL-longitude of tile.
 
         lblMapName.Text = strMap
         lblExtent.Text = extent & " degrees"
@@ -68,18 +69,18 @@ Public Class frmTile
                     Dim GIFBuffer(GifLen - 1) As Byte
                     aFilestream.Position = Ptr + 5
                     aFilestream.Read(GIFBuffer, 0, GifLen)
+                    curTile = Bitmap.FromStream(New IO.MemoryStream(GIFBuffer))
 
-                    'Apply any image adjustments selected by the user.
-                    Using AdjustedImage As New ImageFactory(preserveExifData:=False)
-                        With AdjustedImage
-                            .Load(GIFBuffer)
-                            .Contrast(tbrContrast.Value)
-                            Using aMemoryStream As New IO.MemoryStream()
-                                .Save(aMemoryStream)
-                                ReDim GIFBuffer(aMemoryStream.Length - 1)
-                                GIFBuffer = aMemoryStream.ToArray
-                            End Using
-                        End With
+                    'Apply image processing.
+                    Using aTileImage As New ImageFactory(preserveExifData:=False)
+                        aTileImage.Load(GIFBuffer)
+                        aTileImage.Contrast(tbrContrast.Value)
+                        aTileImage.Saturation(tbrSaturation.Value)
+                        aTileImage.Brightness(tbrBrightness.Value)
+                        Dim outStream As New IO.MemoryStream
+                        aTileImage.Save(outStream)
+                        ReDim GIFBuffer(outStream.Length - 1)
+                        GIFBuffer = outStream.ToArray
                     End Using
 
                     Dim imgGIF As New Bitmap(New IO.MemoryStream(GIFBuffer))
@@ -102,8 +103,37 @@ Public Class frmTile
         Me.Left = frmMain.Left + frmMain.Width
     End Sub
 
-    Private Sub tbrContrast_ValueChanged(sender As Object, e As EventArgs) Handles tbrContrast.ValueChanged
+    Private Sub ImageControlSlider_ValueChanged(sender As Object, e As EventArgs) Handles tbrContrast.ValueChanged,
+                                                                                          tbrSaturation.ValueChanged,
+                                                                                          tbrBrightness.ValueChanged
 
+        Dim TileImage As New ImageFactory(preserveExifData:=False)
+        With TileImage
+            .Load(curTile)
+            .Contrast(tbrContrast.Value)
+            .Saturation(tbrSaturation.Value)
+            .Brightness(tbrBrightness.Value)
+            Dim outStream As New IO.MemoryStream
+            .Save(outStream)
+            pbxTile.Image = Image.FromStream(outStream)
+            outStream.Dispose()
+        End With
+
+        TileImage.Dispose()
     End Sub
 
+    Private Sub btnReset_Click(sender As Object, e As EventArgs) Handles btnReset.Click
+        tbrBrightness.Value = 0
+        tbrContrast.Value = 0
+        tbrSaturation.Value = 0
+        Call ImageControlSlider_ValueChanged(New Object, New EventArgs)
+    End Sub
+
+    Private Sub btnApply_Click(sender As Object, e As EventArgs) Handles btnApply.Click
+        If MsgBox("The map will be re-created using current image setting." & vbCrLf & "Do you want to proceed?", vbOKCancel) = vbOK Then
+            Debug.Print("Proceeding")
+        Else
+            Debug.Print("Aborting")
+        End If
+    End Sub
 End Class

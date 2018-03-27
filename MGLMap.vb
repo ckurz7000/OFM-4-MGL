@@ -183,7 +183,7 @@ Public Class MGLMap
     End Sub
 
     ''' <summary>
-    ''' Estracts all <c>MGLTiles</c> contained in a map file to a folder as GIF files.
+    ''' Extracts all <c>MGLTiles</c> contained in a map file to a folder as GIF files.
     ''' </summary>
     ''' <param name="strMapFilename">The fully qualified file name of the map.</param>
     ''' <param name="strTilesPath">The folder to which the individual tiles are to be extracted.</param>
@@ -356,13 +356,13 @@ Public Class MGLMap
     End Function
 
     ''' <summary>
-    ''' Extracts a single tile-bitmap from a map file, where the tile is specified by a point and a zoom level.
+    ''' Extracts a single tile and returns a memorystream to the tile's GIF data.
     ''' </summary>
-    ''' <param name="Lat">Latitude of the point contained in the tile.</param>
-    ''' <param name="Lon">Longitude of the point contained in the tile.</param>
-    ''' <param name="zoom">OFM zoom level of the tile to be extracted.</param>
-    ''' <returns>A <c>Bitmap</c> of the extracted tile, <c>Nothing</c> if no tile was found.</returns>
-    Public Function GetTile(ByVal Lat As Single, Lon As Single, ByVal zoom As Integer) As Bitmap
+    ''' <param name="Lat">Latitude of a point within the tile (top inclusive)</param>
+    ''' <param name="Lon">Longitude of a point within the tile (left inclusive)</param>
+    ''' <param name="zoom">OFM zoom level of the sought tile</param>
+    ''' <returns>A memorystream containing the tile's GIF data.</returns>
+    Public Function GetTileMemoryStream(ByVal Lat As Single, Lon As Single, ByVal zoom As Integer) As IO.MemoryStream
 
         Dim FoundTile As MGLTile = LatLon2MGLTile(Lat, Lon, zoom)
 
@@ -382,13 +382,26 @@ Public Class MGLMap
                 aFilestream.Read(buffer, 0, buffer.Length)
             End Using
 
-            Dim aMemoryStream As New IO.MemoryStream(buffer)
-            GetTile = Bitmap.FromStream(aMemoryStream)
-            aMemoryStream.Dispose()
-
-            Return GetTile
+            GetTileMemoryStream = New IO.MemoryStream(buffer)
 
         End If
+
+        Return GetTileMemoryStream
+
+    End Function
+
+    ''' <summary>
+    ''' Extracts a single tile-bitmap from a map file, where the tile is specified by a point and a zoom level.
+    ''' </summary>
+    ''' <param name="Lat">Latitude of the point contained in the tile.</param>
+    ''' <param name="Lon">Longitude of the point contained in the tile.</param>
+    ''' <param name="zoom">OFM zoom level of the tile to be extracted.</param>
+    ''' <returns>A <c>Bitmap</c> of the extracted tile, <c>Nothing</c> if no tile was found.</returns>
+    Public Function GetTileBitmap(ByVal Lat As Single, Lon As Single, ByVal zoom As Integer) As Bitmap
+
+        GetTileBitmap = Bitmap.FromStream(GetTileMemoryStream(Lat, Lon, zoom))
+
+        Return GetTileBitmap
 
     End Function
 
