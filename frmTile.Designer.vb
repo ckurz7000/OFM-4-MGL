@@ -26,6 +26,7 @@ Partial Class frmTile
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.pbxTile = New System.Windows.Forms.PictureBox()
         Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.Label7 = New System.Windows.Forms.Label()
         Me.Label9 = New System.Windows.Forms.Label()
         Me.Label13 = New System.Windows.Forms.Label()
         Me.Label6 = New System.Windows.Forms.Label()
@@ -36,6 +37,7 @@ Partial Class frmTile
         Me.Label8 = New System.Windows.Forms.Label()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.Panel2 = New System.Windows.Forms.Panel()
+        Me.tbrContrast = New System.Windows.Forms.TrackBar()
         Me.lblSize = New System.Windows.Forms.Label()
         Me.lblDump = New System.Windows.Forms.Label()
         Me.lblGIFLen = New System.Windows.Forms.Label()
@@ -50,6 +52,7 @@ Partial Class frmTile
         CType(Me.pbxTile, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
+        CType(Me.tbrContrast, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'TableLayoutPanel1
@@ -71,7 +74,7 @@ Partial Class frmTile
         '
         'pbxTile
         '
-        Me.pbxTile.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.pbxTile.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.pbxTile.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.pbxTile.InitialImage = Global.OFM4MGL.My.Resources.Resources.openflightmaps_logo
         Me.pbxTile.Location = New System.Drawing.Point(249, 3)
@@ -85,6 +88,7 @@ Partial Class frmTile
         Me.Panel1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Panel1.Controls.Add(Me.Label7)
         Me.Panel1.Controls.Add(Me.Label9)
         Me.Panel1.Controls.Add(Me.Label13)
         Me.Panel1.Controls.Add(Me.Label6)
@@ -98,6 +102,18 @@ Partial Class frmTile
         Me.Panel1.Name = "Panel1"
         Me.Panel1.Size = New System.Drawing.Size(94, 602)
         Me.Panel1.TabIndex = 1
+        '
+        'Label7
+        '
+        Me.Label7.Anchor = System.Windows.Forms.AnchorStyles.Right
+        Me.Label7.AutoSize = True
+        Me.Label7.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.Label7.Location = New System.Drawing.Point(41, 326)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(49, 13)
+        Me.Label7.TabIndex = 0
+        Me.Label7.Text = "Contrast:"
+        Me.Label7.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'Label9
         '
@@ -204,6 +220,7 @@ Partial Class frmTile
         Me.Panel2.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Panel2.Controls.Add(Me.tbrContrast)
         Me.Panel2.Controls.Add(Me.lblSize)
         Me.Panel2.Controls.Add(Me.lblDump)
         Me.Panel2.Controls.Add(Me.lblGIFLen)
@@ -218,6 +235,17 @@ Partial Class frmTile
         Me.Panel2.Name = "Panel2"
         Me.Panel2.Size = New System.Drawing.Size(140, 602)
         Me.Panel2.TabIndex = 1
+        '
+        'tbrContrast
+        '
+        Me.tbrContrast.LargeChange = 10
+        Me.tbrContrast.Location = New System.Drawing.Point(0, 321)
+        Me.tbrContrast.Maximum = 100
+        Me.tbrContrast.Minimum = -100
+        Me.tbrContrast.Name = "tbrContrast"
+        Me.tbrContrast.Size = New System.Drawing.Size(140, 45)
+        Me.tbrContrast.TabIndex = 1
+        Me.tbrContrast.TickFrequency = 20
         '
         'lblSize
         '
@@ -346,6 +374,8 @@ Partial Class frmTile
         Me.Panel1.ResumeLayout(False)
         Me.Panel1.PerformLayout()
         Me.Panel2.ResumeLayout(False)
+        Me.Panel2.PerformLayout()
+        CType(Me.tbrContrast, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -373,4 +403,6 @@ Partial Class frmTile
     Friend WithEvents lblTileFilename As Label
     Friend WithEvents Label9 As Label
     Friend WithEvents lblSize As Label
+    Friend WithEvents Label7 As Label
+    Friend WithEvents tbrContrast As TrackBar
 End Class

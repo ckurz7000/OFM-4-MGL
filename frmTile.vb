@@ -1,4 +1,6 @@
-﻿Public Class frmTile
+﻿Imports ImageProcessor
+
+Public Class frmTile
 
     Public strMapFilename As String
     Public zoom As Integer
@@ -66,6 +68,20 @@
                     Dim GIFBuffer(GifLen - 1) As Byte
                     aFilestream.Position = Ptr + 5
                     aFilestream.Read(GIFBuffer, 0, GifLen)
+
+                    'Apply any image adjustments selected by the user.
+                    Using AdjustedImage As New ImageFactory(preserveExifData:=False)
+                        With AdjustedImage
+                            .Load(GIFBuffer)
+                            .Contrast(tbrContrast.Value)
+                            Using aMemoryStream As New IO.MemoryStream()
+                                .Save(aMemoryStream)
+                                ReDim GIFBuffer(aMemoryStream.Length - 1)
+                                GIFBuffer = aMemoryStream.ToArray
+                            End Using
+                        End With
+                    End Using
+
                     Dim imgGIF As New Bitmap(New IO.MemoryStream(GIFBuffer))
                     pbxTile.Image = imgGIF
                     lblSize.Text = imgGIF.Width & " x " & imgGIF.Height & " px"
@@ -84,6 +100,10 @@
     Private Sub frmTile_Shown(sender As Object, e As EventArgs) Handles Me.Shown
         Me.Top = frmMain.Top
         Me.Left = frmMain.Left + frmMain.Width
+    End Sub
+
+    Private Sub tbrContrast_ValueChanged(sender As Object, e As EventArgs) Handles tbrContrast.ValueChanged
+
     End Sub
 
 End Class
