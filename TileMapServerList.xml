@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<ArrayOfTileMapServer xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  
+  <TileMapServer Name="Openflightmaps LoRes">
+    <URL>https://snapshots.openflightmaps.org/live/{AIRAC}/tiles/world/noninteractive/epsg3857/merged/256/latest/</URL>
+    <TileSize>256</TileSize>
+    <MaxDownloads>12</MaxDownloads>
+  </TileMapServer>
+  
+  <TileMapServer Name="Openflightmaps HiRes">
+    <URL>https://snapshots.openflightmaps.org/live/{AIRAC}/tiles/world/noninteractive/epsg3857/merged/512/latest/</URL>
+    <TileSize>512</TileSize>
+    <MaxDownloads>12</MaxDownloads>
+  </TileMapServer>
+  
+  <TileMapServer Name="Openstreetmap">
+    <URL>https://a.tile.openstreetmap.org/</URL>
+    <TileSize>256</TileSize>
+    <MaxDownloads>2</MaxDownloads>
+  </TileMapServer>
+
+  <TileMapServer Name="Openstreetmap (high contrast)">
+    <URL>https://b.tile.openstreetmap.fr/osmfr/</URL>
+    <TileSize>256</TileSize>
+    <MaxDownloads>2</MaxDownloads>
+  </TileMapServer>
+
+  <TileMapServer Name="OpenTopomap">
+    <URL>https://b.tile.opentopomap.org/</URL>
+    <TileSize>256</TileSize>
+    <MaxDownloads>4</MaxDownloads>
+  </TileMapServer>
+  
+  <TileMapServer Name="Stamen Terrain">
+    <URL>http://c.tile.stamen.com/terrain/</URL>
+    <TileSize>256</TileSize>
+    <MaxDownloads>4</MaxDownloads>
+  </TileMapServer>
+
+</ArrayOfTileMapServer>
