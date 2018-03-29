@@ -188,7 +188,7 @@ Public Class frmMain
 
     End Function
 
-    Private Function PNG2GIF(ByVal strPNGFilename As String) As Bitmap
+    Public Function PNG2GIF(ByVal strPNGFilename As String) As Bitmap
 
         'Load the PNG, lock it in memory and copy it to a byte array.
         Dim bmpPNG As New Bitmap(strPNGFilename)
@@ -223,7 +223,7 @@ Public Class frmMain
 
     End Function
 
-    Private Sub DeleteGCEBlock(strFilename As String)
+    Public Sub DeleteGCEBlock(strFilename As String)
         'Deletes an optionally present Graphics Control Extension block in the GIF data stream
         'in order to conform to GIF87a standard.
 
@@ -403,7 +403,7 @@ Public Class frmMain
         If DownloadTilesTask.Status = TaskStatus.RanToCompletion Then
             'Generate maps.
             For Each aMap As MGLMap In MapDict.Values
-                aMap.WriteMap(My.Settings.MapsPath & aMap.GetName)
+                aMap.Save(My.Settings.MapsPath & aMap.GetName)
             Next
         End If
 
@@ -454,7 +454,7 @@ Public Class frmMain
 
         'Now write the map files.
         For Each aMap As MGLMap In MapDict.Values
-            aMap.WriteMap(My.Settings.MapsPath & aMap.GetName)
+            aMap.Save(My.Settings.MapsPath & aMap.GetName)
         Next
 
         lblStatus.Text = "Ready."

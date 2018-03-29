@@ -1,5 +1,6 @@
 ﻿Option Explicit On
 
+Imports JeremyAnsel.ColorQuant
 Public Class MGLMap
 
     Private _Tiles As New List(Of MGLTile)
@@ -12,13 +13,42 @@ Public Class MGLMap
     End Sub
 
     ''' <summary>
-    ''' Creates a new instance of <c>MGLMap</c> and adds the specified MGLTile.
+    ''' Creates a new instance of <c>MGLMap</c> and adds the specified list of MGLTiles.
+    ''' Only those tiles are added to the map which lie in the same map as the first tile.
+    ''' Upon exit, 
     ''' </summary>
-    ''' <param name="aTile">The tile to add. It also determines the map region.</param>
-    Public Sub New(aTile As MGLTile)
+    ''' <param name="aTile">The list of tiles' file names to add. It also determines the map region.</param>
+    Public Sub New(ByRef TileList As List(Of String))
+
         _Name = ""
         _Tiles.Clear()
-        AddTile(aTile)
+
+        Dim i As Integer = 0
+        Do
+            Dim Lat As Single
+            Dim Lon As Single
+            Dim zoom As Integer
+            Dim extent As Single
+            Dim str() As String
+
+            str = TileList(i).Split(CChar("_"), CChar("."))
+            zoom = CInt(str(1))
+            extent = MGLMap.MGLExtent(zoom)
+            Lat = CSng(str(2))
+            Lon = CSng(str(3))
+            Dim aTile As New MGLTile(TileList(i), New GeoRectangle(Lon, Lat, extent, extent))
+
+            'Check if the new tile is part of the map coverage.
+            'If yes, add it to the map's tile list and remove it from the TileList.
+            'If  no, leave it in the TileList and move on.
+            Try
+                Me.AddTile(aTile)
+                TileList.RemoveAt(i)
+            Catch ex As Exception
+                i += 1
+            End Try
+        Loop While i < TileList.Count
+
     End Sub
 
 #Region "Properties"
@@ -123,7 +153,7 @@ Public Class MGLMap
     ''' Writes the <c>MGLMap</c> to a file.
     ''' </summary>
     ''' <param name="strMapFileName">Fully qualified file name, including path.</param>
-    Public Sub WriteMap(ByVal strMapFileName As String)
+    Public Sub Save(ByVal strMapFileName As String)
 
         Dim MapStream As New IO.FileStream(strMapFileName, IO.FileMode.Create)
         Dim aMapWriter As New IO.BinaryWriter(MapStream)
@@ -564,6 +594,15 @@ Public Class MGLTile
         End Get
     End Property
 
+    Public ReadOnly Property GetTileName As String
+        Get
+            Return "MGL_" &
+                    (11 - GetMGLZoom) & "_" &
+                    _Bounds.Top & "_" &
+                    _Bounds.Left & ".gif"
+        End Get
+    End Property
+
     Public ReadOnly Property TileExtracted() As Boolean
         Get
             Return FileIO.FileSystem.FileExists(_Path)
@@ -602,15 +641,6 @@ Public Class MGLTile
 
     End Property
 
-    Public ReadOnly Property GetTileName As String
-        Get
-            Return "MGL_" &
-                    (11 - GetMGLZoom) & "_" &
-                    _Bounds.Top & "_" &
-                    _Bounds.Left & ".gif"
-        End Get
-    End Property
-
     Public ReadOnly Property GetPoint(ByVal Lat As Single, ByVal Lon As Single) As Point
         'Returns the pixel coorinates of the requested Lat/Lon point in the tile GIF.
         Get
@@ -625,6 +655,70 @@ Public Class MGLTile
             Return New Point(x, y)
         End Get
     End Property
+
+    Public Shared Sub PNG2GIF87a(ByVal strPNGFilename As String, Optional ByVal strGIFFilename As String = "")
+        'This function converts a PNG file to a GIF87a file.
+
+        If strGIFFilename = "" Then strGIFFilename = IO.Path.ChangeExtension(strPNGFilename, ".gif")
+
+        'Load the PNG, lock it in memory and copy it to a byte array.
+        Dim bmpPNG As New Bitmap(strPNGFilename)
+        Dim bmpPNGData As Imaging.BitmapData = bmpPNG.LockBits(New Rectangle(0, 0, bmpPNG.Width, bmpPNG.Height), Imaging.ImageLockMode.ReadOnly, Imaging.PixelFormat.Format32bppArgb)
+        Dim nPNGBytes As ULong = Math.Abs(bmpPNG.Width * 4) * bmpPNG.Height
+        Dim PNGBytes(nPNGBytes - 1) As Byte
+        For line As Integer = 0 To bmpPNG.Height - 1
+            Runtime.InteropServices.Marshal.Copy(bmpPNGData.Scan0 + line * bmpPNGData.Stride, PNGBytes, line * bmpPNG.Width * 4, bmpPNGData.Width * 4)
+        Next
+        bmpPNG.UnlockBits(bmpPNGData)
+
+        Dim qResult As ColorQuantizerResult = New WuColorQuantizer().Quantize(PNGBytes, My.Settings.nColors)
+
+        'Generate color table from qResult.Palette
+        Dim bmpGIF As New Bitmap(bmpPNG.Width, bmpPNG.Height, Imaging.PixelFormat.Format8bppIndexed)
+        Dim cTable As Imaging.ColorPalette = bmpGIF.Palette
+        For i As Integer = 0 To qResult.Palette.Count / 4 - 1
+            cTable.Entries(i) = Color.FromArgb(qResult.Palette(i * 4 + 3), qResult.Palette(i * 4 + 2), qResult.Palette(i * 4 + 1), qResult.Palette(i * 4))
+        Next i
+
+        'Make the quantized byte array into a GIF
+        Dim bmpGIFData As Imaging.BitmapData = bmpGIF.LockBits(New Rectangle(0, 0, bmpPNG.Width, bmpPNG.Height), Imaging.ImageLockMode.WriteOnly, Imaging.PixelFormat.Format8bppIndexed)
+        bmpPNG.Dispose()
+        For line As Integer = 0 To bmpGIF.Height - 1
+            Runtime.InteropServices.Marshal.Copy(qResult.Bytes, line * bmpGIF.Width, bmpGIFData.Scan0 + line * bmpGIFData.Stride, bmpGIF.Width)
+        Next
+        bmpGIF.UnlockBits(bmpGIFData)
+        bmpGIF.Palette = cTable
+
+        Dim buffer() As Byte
+        Using aMemoryStream As New IO.MemoryStream()
+            bmpGIF.Save(aMemoryStream, Imaging.ImageFormat.Gif)
+            ReDim buffer(aMemoryStream.Length - 1)
+            buffer = aMemoryStream.ToArray()
+        End Using
+
+        'Change the header for GIF87a instead of GIF89a.
+        buffer(4) = Asc(7)
+
+        Dim PackedByte As Byte = buffer(10)
+        Dim ColorTableSize As Integer = 2 ^ ((PackedByte And 7) + 1) * 3
+        Dim idx As Long = 0
+        If PackedByte > &H80 Then
+            'global color table present.
+            idx = 6 + 7 + ColorTableSize
+        Else
+            idx = 6 + 7
+        End If
+        Using aFilestream As New IO.FileStream(strGIFFilename, IO.FileMode.Create)
+            If buffer(idx) = &H21 AndAlso buffer(idx + 1) = &HF9 AndAlso buffer(idx + 2) = &H4 Then
+                'We found a Graphics Control Extension Block starting at position idx and extending for 8 bytes, so remove it.
+                aFilestream.Write(buffer, 0, idx)
+                aFilestream.Write(buffer, idx + 8, buffer.Length - (idx + 8))
+            Else
+                aFilestream.Write(buffer, 0, buffer.Count)
+            End If
+        End Using
+
+    End Sub
 
 #End Region
 

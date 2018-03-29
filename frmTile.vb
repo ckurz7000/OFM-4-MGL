@@ -130,10 +130,50 @@ Public Class frmTile
     End Sub
 
     Private Sub btnApply_Click(sender As Object, e As EventArgs) Handles btnApply.Click
-        If MsgBox("The map will be re-created using current image setting." & vbCrLf & "Do you want to proceed?", vbOKCancel) = vbOK Then
-            Debug.Print("Proceeding")
-        Else
-            Debug.Print("Aborting")
+        If MsgBox("The map will be re-created using current image setting." & vbCrLf &
+                  "The existing map will be overwritten." & vbCrLf &
+                  "Do you want to proceed?", vbOKCancel) = vbOK Then
+            'Apply the image processing settings to all tiles at the current zoom level in the map.
+            'To do this, we extract all tiles from the map to a temporary directory.
+            'Then we apply the image settings and re-assemble them to a map.
+
+            'Create a temporary directory; empty it if it already exists.
+            Dim TempTilesDir As String = My.Settings.TilesPath & "Temp\"
+            If IO.Directory.Exists(TempTilesDir) Then
+                For Each deleteFile In IO.Directory.EnumerateFiles(TempTilesDir)
+                    Try
+                        IO.File.Delete(deleteFile)
+                    Catch ex As Exception
+                        'Just skip the file quietly.
+                    End Try
+                Next
+            Else
+                FileSystem.MkDir(TempTilesDir)
+            End If
+            MGLMap.ExtractTiles(strMapFilename, TempTilesDir)
+
+            'Apply image settings to every file.
+            'Save first as PNG and then convert it to GIF87a with quantization and all.
+            Dim DirInfo As New IO.DirectoryInfo(TempTilesDir)
+            For Each aFile In DirInfo.EnumerateFiles
+                Using AdjustImage As New ImageFactory(preserveExifData:=False)
+                    With AdjustImage
+                        .Load(aFile.FullName)
+                        .Brightness(tbrBrightness.Value)
+                        .Contrast(tbrContrast.Value)
+                        .Saturation(tbrSaturation.Value)
+                        .Format(New Imaging.Formats.PngFormat)
+                        .Save(IO.Path.ChangeExtension(aFile.FullName, ".png"))
+                    End With
+                End Using
+                Call MGLTile.PNG2GIF87a(IO.Path.ChangeExtension(aFile.FullName, ".png"))
+                IO.File.Delete(IO.Path.ChangeExtension(aFile.FullName, ".png"))
+            Next
+
+            'Re-assemble map.
+            Dim NewMap As New MGLMap(IO.Directory.EnumerateFiles(TempTilesDir, "MGL_*.gif").ToList)
+            NewMap.Save(My.Settings.MapsPath & NewMap.GetName)
+
         End If
     End Sub
 End Class
