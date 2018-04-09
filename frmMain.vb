@@ -2,6 +2,7 @@
 
 Imports System.ComponentModel
 Imports JeremyAnsel.ColorQuant
+Imports Microsoft.VisualBasic.FileIO.FileSystem
 
 Public Class frmMain
 
@@ -341,6 +342,14 @@ Public Class frmMain
             frmSettings.ShowDialog()
         End While
 
+        'Check that the bounding box starts at an even lat/lon when 1:2M scale is selected.
+        If ((txtTLLat.Text Mod 2 <> 0) OrElse (txtTLLon.Text Mod 2 <> 0)) And
+                (chk3.Checked) Then
+            MsgBox("With scale 1:2M selected you need to specify an even number for the top latitude and right longitude." & vbCrLf &
+                   "Either unselect 1:2M or ensure even degree boundaries for the top-left corner of the map.", vbOKOnly)
+            Exit Sub
+        End If
+
         'Set the globe spinning.
         pbxGlobe.Image = My.Resources.Globe
         btnCancel.Enabled = True
@@ -534,6 +543,21 @@ Public Class frmMain
 
     Private Sub mnuHelp_Click(sender As Object, e As EventArgs) Handles mnuHelp.Click
         Help.ShowHelp(Me, "OFM-4-MGL.chm")
+    End Sub
+
+    Private Sub ToolStripMenuItem2_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem2.Click
+
+        If MsgBox("Do you want to clear the tile cache: " & vbCrLf & My.Settings.TilesPath & "?", vbYesNo) = vbYes Then
+
+            On Error Resume Next
+            DeleteDirectory(My.Settings.TilesPath & "Temp", FileIO.DeleteDirectoryOption.DeleteAllContents)
+            For Each aFile In IO.Directory.GetFiles(My.Settings.TilesPath)
+                DeleteFile(aFile)
+            Next
+            On Error GoTo 0
+
+        End If
+
     End Sub
 
 #End Region

@@ -103,9 +103,14 @@ Public Class frmTile
         Me.Left = frmMain.Left + frmMain.Width
     End Sub
 
-    Private Sub ImageControlSlider_ValueChanged(sender As Object, e As EventArgs) Handles tbrContrast.ValueChanged,
+    Private Sub ImageControlSlider_ValueChanged(aTrackbar As TrackBar, e As EventArgs) Handles tbrContrast.ValueChanged,
                                                                                           tbrSaturation.ValueChanged,
                                                                                           tbrBrightness.ValueChanged
+        Select Case aTrackbar.Name
+            Case "tbrBrightness" : lblBrightness.Text = tbrBrightness.Value
+            Case "tbrContrast" : lblContrast.Text = tbrContrast.Value
+            Case "tbrSaturation" : lblSaturation.Text = tbrSaturation.Value
+        End Select
 
         Dim TileImage As New ImageFactory(preserveExifData:=False)
         With TileImage
@@ -126,7 +131,9 @@ Public Class frmTile
         tbrBrightness.Value = 0
         tbrContrast.Value = 0
         tbrSaturation.Value = 0
-        Call ImageControlSlider_ValueChanged(New Object, New EventArgs)
+        Call ImageControlSlider_ValueChanged(tbrBrightness, New EventArgs)
+        Call ImageControlSlider_ValueChanged(tbrContrast, New EventArgs)
+        Call ImageControlSlider_ValueChanged(tbrSaturation, New EventArgs)
     End Sub
 
     Private Sub btnApply_Click(sender As Object, e As EventArgs) Handles btnApply.Click
@@ -136,6 +143,9 @@ Public Class frmTile
             'Apply the image processing settings to all tiles at the current zoom level in the map.
             'To do this, we extract all tiles from the map to a temporary directory.
             'Then we apply the image settings and re-assemble them to a map.
+
+            frmMain.lblStatus.Text = "Applying imnage corrections..."
+            Application.UseWaitCursor = True
 
             'Create a temporary directory; empty it if it already exists.
             Dim TempTilesDir As String = My.Settings.TilesPath & "Temp\"
@@ -174,6 +184,9 @@ Public Class frmTile
             Dim NewMap As New MGLMap(IO.Directory.EnumerateFiles(TempTilesDir, "MGL_*.gif").ToList)
             NewMap.Save(My.Settings.MapsPath & NewMap.GetName)
 
+            Application.UseWaitCursor = False
+            frmMain.lblStatus.Text = "Ready."
         End If
     End Sub
+
 End Class

@@ -222,7 +222,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="TileWidths.txt" />
     <None Include="Enigma raster map format %28new%29.txt" />
     <Resource Include="Images\EmptyTile.bmp" />
     <Resource Include="Images\openflightmaps_logo.png" />
@@ -233,7 +232,6 @@
     <None Include="Images\ArrowLeft.png" />
     <None Include="Images\ArrowRight.png" />
     <None Include="Images\ArrowUp.png" />
-    <Content Include="My Project\XMLFile1.xml" />
     <Content Include="OFM-4-MGL.ico" />
     <EmbeddedResource Include="TileMapServerList.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
